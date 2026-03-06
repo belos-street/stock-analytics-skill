@@ -148,9 +148,4 @@ Agent：调用 asset-allocation-rebalancing，分析配置偏离度...
 
 ## 许可证
 
-MIT License - 欢迎开源和贡献
-
-## 致谢
-
-- 感谢所有开源社区的贡献者
-- 感谢 Trae IDE 提供的 Skill 框架支持
+MIT License
