@@ -15,3 +15,5 @@ Thumbs.db
 *.log
 
 node_modules/
+
+*.lockb

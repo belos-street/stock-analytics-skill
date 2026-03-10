@@ -1,16 +1,32 @@
-# 个人长期复利投资策略 - Agent配置说明
+# 长期复利投资策略 - Agent配置 变量配置
 
-## 投资者概况
+说明
 
-- **投资者类型**：普通新手，无盯盘时间
-- **投资目标**：追求长期稳健复利，做时间的朋友
-- **风险偏好**：中低风险为主，小仓位高弹性进攻，严控回撤
-- **总资产**：100万元
-- **核心原则**：长期持有、分红再投入、不波段、不追热点、年度再平衡
+##<!--
+{
+  "PROJECT_PATH": "C:\\Users\\samym\\Documents\\stock-analysis-skill\\stock-analytics-skill",
+  "POSITION_FILE": "position.md"
+}
+-->
 
-## 持仓配置
+---
 
-**详细持仓信息请查看**：`position.md`
+## 概述
+
+本Agent用于辅助长期复利投资策略的分析与决策。投资者可根据自身情况修改上方**变量配置**区域，定义个人持仓和投资偏好。
+
+---
+
+## 配置文件
+
+### {{POSITION_FILE}} - 个人持仓配置
+
+**详细持仓信息请查看**：`{{POSITION_FILE}}`
+
+该文件包含：
+- 投资者概况（风险偏好、投资目标、资产规模等）
+- 资产配置明细（持仓标的、目标占比）
+- 持仓标的与Skill对应关系
 
 ---
 
@@ -23,19 +39,20 @@
 **使用方法**：
 ```bash
 # 进入项目目录
-cd /Volumes/jiangzhi-ssd/code/personal/stock-analytics-skill
+cd {{PROJECT_PATH}}
 
 # 运行 CLI
 bun run main.ts [options]
 ```
 
 **可用参数**：
-| 参数 | 说明 | 示例 |
-|-----|------|------|
-| `-s, --stocks` | 股票代码（逗号分隔） | `-s hk00700,sh000001` |
-| `-f, --funds` | 基金代码（逗号分隔） | `-f 320007,110022` |
-| `-o, --format` | 输出格式: raw \| llm | `-o llm` |
-| `-h, --help` | 查看帮助 | |
+
+| 参数             | 说明               | 示例                    |
+| -------------- | ---------------- | --------------------- |
+| `-s, --stocks` | 股票代码（逗号分隔）       | `-s hk00700,sh000001` |
+| `-f, --funds`  | 基金代码（逗号分隔）       | `-f 320007,110022`    |
+| `-o, --format` | 输出格式: raw \| llm | `-o llm`              |
+| `-h, --help`   | 查看帮助             | <br />                |
 
 **输出格式**：
 - `llm`（默认）：大模型友好的统一格式，包含 type 字段
@@ -44,16 +61,16 @@ bun run main.ts [options]
 **示例命令**：
 ```bash
 # 查询腾讯控股股票
-bun run main.ts -s hk00700
+cd {{PROJECT_PATH}} && bun run main.ts -s hk00700
 
 # 查询多只股票
-bun run main.ts -s hk00700,hk01810
+cd {{PROJECT_PATH}} && bun run main.ts -s hk00700,hk01810
 
 # 查询基金
-bun run main.ts -f 320007
+cd {{PROJECT_PATH}} && bun run main.ts -f 320007
 
 # 同时查询股票和基金
-bun run main.ts -s hk00700 -f 320007
+cd {{PROJECT_PATH}} && bun run main.ts -s hk00700 -f 320007
 ```
 
 **支持的市场**：
@@ -187,7 +204,7 @@ bun run main.ts -s hk00700 -f 320007
 **触发条件**：询问整体持仓情况、今日表现、需要做什么操作等
 
 **调用方式**：
-1. 首先读取 `position.md` 了解持仓配置
+1. 首先读取 `{{POSITION_FILE}}` 了解持仓配置
 2. 调用本地 CLI 工具获取各持仓标的数据（优先）
 3. 根据持仓标的，分别调用对应的专业Skill
 4. 最后调用 `asset-allocation-rebalancing` 给出整体建议
@@ -199,39 +216,20 @@ bun run main.ts -s hk00700 -f 320007
 
 ---
 
-## 持仓标的与Skill对应关系
-
-根据position.md中的持仓配置，按以下规则调用Skill：
-
-| 持仓标的类型 | 对应Skill | 数据获取方式 |
-|-------------|----------|-------------|
-| 债券基金（006493、006961、002276、217024） | **bond-fund-analysis** | WebSearch |
-| 红利低波50ETF（515450） | **dividend-low-vol-etf** | WebSearch |
-| 现金流ETF（159201） | **cash-flow-etf-analysis** | WebSearch |
-| A500ETF（563360） | **broad-index-etf-analysis** | WebSearch |
-| 招商银行（600036） | **stock-deep-analysis** | WebSearch |
-| 中国移动（600941） | **stock-deep-analysis** | WebSearch |
-| 恒生医疗ETF（513060） | **hk-stock-analysis** | WebSearch |
-| 恒生科技ETF（513010） | **hk-stock-analysis** | WebSearch |
-
----
-
 ## 持仓分析报告流程
 
 当用户要求分析持仓时，按照以下流程：
 
 ### 第一步：读取持仓配置
-- 读取 `position.md` 文件，了解投资者的持仓配置
+- 读取 `{{POSITION_FILE}}` 文件，了解投资者的持仓配置
 - 了解各持仓标的的类型、代码、目标占比
 
 ### 第二步：获取实时数据
 优先使用本地 CLI 工具获取股票/基金实时数据：
 
 ```bash
-# 港股示例
+cd {{PROJECT_PATH}}
 bun run main.ts -s hk00700,hk01810
-
-# A股示例（需要确认支持后使用）
 bun run main.ts -s sh600519,sh000001
 ```
 
@@ -273,7 +271,7 @@ bun run main.ts -s sh600519,sh000001
 **优先使用本地 CLI 工具**：
 
 ```bash
-cd /Volumes/jiangzhi-ssd/code/personal/stock-analytics-skill
+cd {{PROJECT_PATH}}
 
 # 查询港股持仓
 bun run main.ts -s hk00700,hk01810 -o llm
@@ -281,7 +279,7 @@ bun run main.ts -s hk00700,hk01810 -o llm
 # 查询基金持仓
 bun run main.ts -f 320007,110022 -o llm
 
-# 查询A股持仓（需要确认支持）
+# 查询A股持仓
 bun run main.ts -s sh600519,sh000001 -o llm
 ```
 
