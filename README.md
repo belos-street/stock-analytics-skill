@@ -58,6 +58,11 @@ stock-analytics-skill/
 ### 1. 安装依赖
 
 ```bash
+npm install -g bun
+bun --version
+```
+
+```bash
 bun install
 ```
 
