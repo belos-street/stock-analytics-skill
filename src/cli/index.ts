@@ -1,6 +1,5 @@
 import { Command } from 'commander'
 import chalk from 'chalk'
-import { readFileSync } from 'fs'
 import {
   getStockData,
   getFundData,
@@ -13,7 +12,6 @@ import type { MarketDataResponse, StockData, FundData } from '../types/index'
 interface CliOptions {
   stocks?: string
   funds?: string
-  agent?: string
   format?: string
 }
 
@@ -26,7 +24,6 @@ export async function runCli() {
     .version('1.0.0')
     .option('-s, --stocks <codes>', '股票代码列表（逗号分隔）', '')
     .option('-f, --funds <codes>', '基金代码列表（逗号分隔）', '')
-    .option('-a, --agent <path>', 'Agent配置文件路径', '')
     .option('-o, --format <type>', '输出格式: raw | llm', 'llm')
     .parse(process.argv)
 
@@ -41,17 +38,6 @@ export async function runCli() {
   const stocks = options.stocks?.split(',').filter(Boolean) || []
   const funds = options.funds?.split(',').filter(Boolean) || []
   const format = options.format === 'raw' ? 'raw' : 'llm'
-
-  if (options.agent) {
-    try {
-      const agentContent = readFileSync(options.agent, 'utf-8')
-      console.log(chalk.cyan('=== Agent配置 ==='))
-      console.log(chalk.gray(`已加载: ${options.agent}`))
-      console.log(chalk.gray(`内容长度: ${agentContent.length} 字符\n`))
-    } catch (e) {
-      console.log(chalk.red(`读取Agent配置失败: ${options.agent}`))
-    }
-  }
 
   if (stocks.length > 0) {
     console.log(chalk.cyan('=== 获取股票数据 ==='))

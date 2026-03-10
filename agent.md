@@ -34,7 +34,6 @@ bun run main.ts [options]
 |-----|------|------|
 | `-s, --stocks` | 股票代码（逗号分隔） | `-s hk00700,sh000001` |
 | `-f, --funds` | 基金代码（逗号分隔） | `-f 320007,110022` |
-| `-a, --agent` | Agent配置文件路径 | `-a ./agent.md` |
 | `-o, --format` | 输出格式: raw \| llm | `-o llm` |
 | `-h, --help` | 查看帮助 | |
 
@@ -55,9 +54,6 @@ bun run main.ts -f 320007
 
 # 同时查询股票和基金
 bun run main.ts -s hk00700 -f 320007
-
-# 查询并加载Agent配置
-bun run main.ts -s hk00700 -a ./agent.md
 ```
 
 **支持的市场**：

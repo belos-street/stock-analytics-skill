@@ -118,11 +118,6 @@ bun run main.ts -s hk00700,hk01810 -f 320007,110022
 [复制 agent.md 的完整内容]
 ```
 
-或者在调用CLI时使用 `-a` 参数：
-```bash
-bun run main.ts -s hk00700 -a ./agent.md
-```
-
 **第三步：验证配置**
 
 配置完成后，可以尝试让大模型执行一个简单的任务来验证配置是否生效：
@@ -185,7 +180,6 @@ bun run main.ts [options]
 |-----|------|------|
 | `-s, --stocks` | 股票代码（逗号分隔 hk00700） | `-s,sh000001` |
 | `-f, --funds` | 基金代码（逗号分隔） | `-f 320007,110022` |
-| `-a, --agent` | Agent配置文件路径 | `-a ./agent.md` |
 | `-o, --format` | 输出格式: raw \| llm | `-o llm` |
 | `-h, --help` | 查看帮助 | |
 
