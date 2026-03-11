@@ -2,7 +2,7 @@
 
 说明
 
-##<!--
+<!--
 {
   "PROJECT_PATH": "C:\\Users\\samym\\Documents\\stock-analysis-skill\\stock-analytics-skill",
   "POSITION_FILE": "position.md"
