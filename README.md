@@ -58,12 +58,12 @@ stock-analytics-skill/
 ### 1. 安装依赖
 
 ```bash
-npm install -g bun
+npm install -g bun  # 如果有bun运行时，则跳过
 bun --version
 ```
 
 ```bash
-bun install
+bun install 
 ```
 
 ### 2. 查询股票/基金数据
