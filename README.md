@@ -186,7 +186,7 @@ bun run main.ts -s hk00700,hk01810 -f 320007,110022
 请加载以下 Agent 配置文件，并按照其中的规则执行任务：
 [复制 agent.md 的完整内容]
 ```
-或者将agent.md内容作为system prompt上传至trae，生成随时可对话的智能体
+或者将agent.md内容作为system prompt上传至IDE Agent对话框，生成随时可对话的智能体
 ```
 设置->智能体->创建->输入智能体名称->agent.md内容粘贴至提示词
 ```
@@ -349,7 +349,7 @@ stock-analytics-skill/
 │   ├── parser/           # 数据解析
 │   ├── types/            # 类型定义
 │   └── utils/            # 工具函数
-├── .trae/skills/         # Skill技能目录（22个技能）
+├── .agents/skills/        # Skill技能目录（22个技能）
 ├── position.md           # 持仓配置示例
 ├── agent.md              # Agent配置说明
 ├── package.json          # 项目依赖
@@ -375,7 +375,7 @@ stock-analytics-skill/
 
 ### 添加新的Skill
 
-1. 在 `.trae/skills/` 目录下创建新目录
+1. 在 `.agents/skills/` 目录下创建新目录
 2. 编写 `SKILL.md` 文件，定义技能说明
 3. 在 `agent.md` 中添加场景映射
 

@@ -702,7 +702,7 @@ bun run main.ts -s sh600519,sh000001 -o llm
 ## 文件位置
 
 - **持仓配置**：`position.md` ← 详细持仓信息
-- **Agent配置**：`agent.md` ← 本文件
-- **Skills目录**：`.trae/skills/`
+- **Agent配置**：`agents.md` ← 本文件
+- **Skills目录**：`.agents/skills/`
 - **数据工具**：`main.ts` / `src/` ← CLI 工具源码
 - **报告输出**：`reports/` ← 持仓日报
