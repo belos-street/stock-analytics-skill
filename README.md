@@ -145,7 +145,13 @@ bun run main.ts -s hk00700,hk01810 -f 320007,110022
 
 ### 3. 配置持仓
 
-编辑 `position.md` 文件，配置您的持仓信息。
+复制 `position.example.md` 为 `position.md`，然后编辑 `position.md` 配置您的持仓信息：
+
+```bash
+cp position.example.md position.md
+```
+
+> `position.md` 包含个人持仓数据，已加入 `.gitignore`，不会被提交到仓库。请放心编辑。
 
 ### 4. 配置Agent
 
@@ -350,7 +356,7 @@ stock-analytics-skill/
 │   ├── types/            # 类型定义
 │   └── utils/            # 工具函数
 ├── .agents/skills/        # Skill技能目录（22个技能）
-├── position.md           # 持仓配置示例
+├── position.example.md   # 持仓配置示例模板
 ├── agent.md              # Agent配置说明
 ├── package.json          # 项目依赖
 └── README.md            # 项目介绍
