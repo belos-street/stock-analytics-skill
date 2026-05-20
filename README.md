@@ -25,7 +25,7 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 风险偏好：中低风险为主，小仓位高弹性进攻，严控回撤
 ```
 
-## Skill 技能一览（23个技能）
+## Skill 技能一览（24个技能）
 
 ### 市场分析类
 
@@ -41,6 +41,7 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 |-------|------|---------|
 | dividend-low-vol-etf | 红利低波ETF | 分析红利ETF加仓减仓时机 |
 | broad-index-etf-analysis | 宽基ETF | 分析A500、沪深300等宽基指数 |
+| a500-index-investment | A500指数投资 | A500专属PE建仓、倒金字塔加仓、减仓止盈 |
 | cash-flow-etf-analysis | 现金流ETF | 分析现金流ETF、现金流稳定性 |
 
 ### 基金投资类
@@ -99,6 +100,7 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 | 债券基金 | 询问债券基金、利率影响 | bond-fund-analysis |
 | 港股市场 | 询问港股、恒生医疗/科技ETF | hk-stock-analysis |
 | 宽基ETF | 询问A500、沪深300ETF估值 | broad-index-etf-analysis |
+| A500策略 | 询问A500建仓、PE分位、加仓减仓 | a500-index-investment |
 | 个股分析 | 询问个股基本面、财务、估值 | stock-deep-analysis |
 | 现金流ETF | 询问现金流ETF、投资策略 | cash-flow-etf-analysis |
 | 资产配置 | 询问配置、再平衡、仓位管理 | asset-allocation-rebalancing |
@@ -357,7 +359,7 @@ stock-analytics-skill/
 │   ├── parser/           # 数据解析
 │   ├── types/            # 类型定义
 │   └── utils/            # 工具函数
-├── .agents/skills/        # Skill技能目录（23个技能）
+├── .agents/skills/        # Skill技能目录（24个技能）
 ├── position.example.md   # 持仓配置示例模板
 ├── agent.md              # Agent配置说明
 ├── package.json          # 项目依赖
