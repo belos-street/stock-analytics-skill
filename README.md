@@ -25,7 +25,7 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 风险偏好：中低风险为主，小仓位高弹性进攻，严控回撤
 ```
 
-## Skill 技能一览（22个技能）
+## Skill 技能一览（23个技能）
 
 ### 市场分析类
 
@@ -67,6 +67,7 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 |-------|------|---------|
 | investment-idea-generator | 投资标的筛选 | 量化筛选、主题扫描发现机会 |
 | thematic-stock-picker | 按主题选股 | AI、新能源等主题投资机会 |
+| growth-stock-screener | 八维成长股筛选 | 从创始人、产品力、团队等8个维度筛选成长标的 |
 
 ### 债券与信用类
 
@@ -107,6 +108,7 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 | 基金筛选 | 根据风险偏好筛选基金 | fund-screening |
 | 基金对比 | 对比多只基金业绩、风险 | fund-comparison |
 | 主题选股 | AI、新能源等主题投资机会 | thematic-stock-picker |
+| 八维选股 | 创始人驱动、产品力、团队等8维筛选 | growth-stock-screener |
 | 估值分析 | 估值方法、相对估值分析 | valuation-framework |
 | 个股深度 | 深度研究个股投资逻辑 | stock-investment-logic |
 | 可比公司 | 估值对标分析 | comparable-company-analysis |
@@ -355,7 +357,7 @@ stock-analytics-skill/
 │   ├── parser/           # 数据解析
 │   ├── types/            # 类型定义
 │   └── utils/            # 工具函数
-├── .agents/skills/        # Skill技能目录（22个技能）
+├── .agents/skills/        # Skill技能目录（23个技能）
 ├── position.example.md   # 持仓配置示例模板
 ├── agent.md              # Agent配置说明
 ├── package.json          # 项目依赖
