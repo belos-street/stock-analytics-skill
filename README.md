@@ -25,7 +25,7 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 风险偏好：中低风险为主，小仓位高弹性进攻，严控回撤
 ```
 
-## Skill 技能一览（24个技能）
+## Skill 技能一览（26个技能）
 
 ### 市场分析类
 
@@ -61,6 +61,8 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 | announcement-analysis | 公告与财报 | 解读公告、年报、季报 |
 | comparable-company-analysis | 可比公司分析 | 估值对标分析、构建Comps表 |
 | valuation-framework | 估值与定价 | 估值方法选择、相对估值分析 |
+| buffett-value-investing | 巴菲特价值投资 | 基于四大原则（能力圈、护城河、安全边际、长期持有）分析个股 |
+| graham-value-investing | 格雷厄姆价值投资 | 量化筛选、安全边际、净净值策略、深度价值分析 |
 
 ### 投资发现类
 
@@ -120,6 +122,8 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 | 债券利率 | 利率走势、久期策略 | bond-yield-analysis |
 | 宏观传导 | 宏观变量对行业的影响 | macro-sector-transmission |
 | 宏观数据 | CPI、PPI、PMI等数据解读 | macro-data-interpretation |
+| 巴菲特分析 | 价值投资四大原则分析个股 | buffett-value-investing |
+| 格雷厄姆分析 | 低估值筛选、烟蒂股策略、深度价值 | graham-value-investing |
 
 ## 快速开始
 
