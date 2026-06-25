@@ -32,7 +32,6 @@ export interface FormattedDividend {
   current_price: number
   dividend_per_share: number
   yield_rate: number
-  annual_yield_rate?: number
   latest_dividend_date: string
   latest_dividend_desc: string
 }
@@ -86,7 +85,6 @@ export function formatDividendYield(data: any): FormattedDividend {
     current_price: data.currentPrice,
     dividend_per_share: data.dividendPerShare,
     yield_rate: data.yieldRate,
-    annual_yield_rate: data.annualYieldRate,
     latest_dividend_date: data.latestDividend?.reportDate || '',
     latest_dividend_desc: data.latestDividend?.dividendDesc || ''
   }
@@ -107,7 +105,9 @@ export function outputData(
 
   switch (format) {
     case 'json':
-      const jsonOutput = pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data)
+      const jsonOutput = pretty
+        ? JSON.stringify(data, null, 2)
+        : JSON.stringify(data)
       console.log(jsonOutput)
       break
 
@@ -118,10 +118,12 @@ export function outputData(
     case 'csv':
       if (data.length > 0) {
         const headers = Object.keys(data[0]).join(',')
-        const rows = data.map(item =>
-          Object.values(item).map(v =>
-            typeof v === 'string' && v.includes(',') ? `"${v}"` : v
-          ).join(',')
+        const rows = data.map((item) =>
+          Object.values(item)
+            .map((v) =>
+              typeof v === 'string' && v.includes(',') ? `"${v}"` : v
+            )
+            .join(',')
         )
         console.log([headers, ...rows].join('\n'))
       }
