@@ -1,7 +1,18 @@
 {
   "name": "stock-analytics-skill",
+  "version": "2.0.0",
   "module": "main.ts",
   "type": "module",
+  "bin": {
+    "stock-analytics": "./main.ts"
+  },
+  "scripts": {
+    "start": "bun run main.ts",
+    "quote": "bun run main.ts -s",
+    "fund": "bun run main.ts -f",
+    "dividend": "bun run main.ts --dividend",
+    "test:sdk": "bun run api/test-stock-sdk.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -11,6 +22,6 @@
   "dependencies": {
     "chalk": "^5.6.2",
     "commander": "^14.0.3",
-    "iconv-lite": "^0.7.2"
+    "stock-sdk": "^2.1.0"
   }
 }

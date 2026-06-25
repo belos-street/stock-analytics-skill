@@ -34,7 +34,7 @@
 
 ### 本地 CLI 工具
 
-项目提供本地命令行工具，可直接获取股票/基金实时数据：
+项目提供本地命令行工具，基于 [stock-sdk](https://github.com/chengzuopeng/stock-sdk)，可直接获取股票/基金实时数据：
 
 **使用方法**：
 ```bash
@@ -47,36 +47,50 @@ bun run main.ts [options]
 
 **可用参数**：
 
-| 参数             | 说明               | 示例                    |
-| -------------- | ---------------- | --------------------- |
-| `-s, --stocks` | 股票代码（逗号分隔）       | `-s hk00700,sh000001` |
-| `-f, --funds`  | 基金代码（逗号分隔）       | `-f 320007,110022`    |
-| `-o, --format` | 输出格式: raw \| llm | `-o llm`              |
-| `-h, --help`   | 查看帮助             | <br />                |
+| 参数 | 说明 | 示例 |
+|------|------|------|
+| `-s, --stocks` | A股/ETF代码（逗号分隔） | `-s sh600519,sh600036` |
+| `-f, --funds` | 基金代码（逗号分隔） | `-f 006493,006961` |
+| `--hk` | 港股代码（逗号分隔） | `--hk 00700,01810` |
+| `--us` | 美股代码（逗号分隔） | `--us AAPL,MSFT` |
+| `--dividend` | 股息率查询 | `--dividend sh600941` |
+| `--search` | 搜索股票/基金 | `--search 招商银行` |
+| `--kline` | K线数据 | `--kline sh600519 --period daily` |
+| `-o, --format` | 输出格式 | `-o json/table/csv` |
+| `--pretty` | 美化JSON输出 | `--pretty` |
 
 **输出格式**：
-- `llm`（默认）：大模型友好的统一格式，包含 type 字段
-- `raw`：原始数据结构
+- `json`（默认）：JSON格式，适合大模型解析
+- `table`：表格格式，适合人类阅读
+- `csv`：CSV格式，适合导出
 
 **示例命令**：
 ```bash
-# 查询腾讯控股股票
-cd {{PROJECT_PATH}} && bun run main.ts -s hk00700
+# 查询A股股票
+cd {{PROJECT_PATH}} && bun run main.ts -s sh600941,sh600036
 
-# 查询多只股票
-cd {{PROJECT_PATH}} && bun run main.ts -s hk00700,hk01810
+# 查询港股
+cd {{PROJECT_PATH}} && bun run main.ts --hk 00700
 
 # 查询基金
-cd {{PROJECT_PATH}} && bun run main.ts -f 320007
+cd {{PROJECT_PATH}} && bun run main.ts -f 006493,006961
 
-# 同时查询股票和基金
-cd {{PROJECT_PATH}} && bun run main.ts -s hk00700 -f 320007
+# 查询股息率
+cd {{PROJECT_PATH}} && bun run main.ts --dividend sh600941
+
+# 搜索股票
+cd {{PROJECT_PATH}} && bun run main.ts --search 中国移动
+
+# 美化输出
+cd {{PROJECT_PATH}} && bun run main.ts -s sh600941 --pretty
 ```
 
 **支持的市场**：
-- 港股：`hk00700`（腾讯控股）、`hk01810`（小米集团）等
-- A股：`sh000001`（上证指数）、`sh600519`（贵州茅台）等
-- 基金：天天基金网支持的基金代码
+- **A股**：sh600519（贵州茅台）、sh600036（招商银行）等
+- **港股**：00700（腾讯控股）、01810（小米集团）等
+- **美股**：AAPL（苹果）、MSFT（微软）等
+- **基金**：006493（南方中债）、006961（南方中债7-10年）等
+- **ETF**：sh515450（红利低波50ETF）等
 
 ---
 
@@ -606,8 +620,18 @@ cd {{PROJECT_PATH}} && bun run main.ts -s sh000001,sh000300
 
 ```bash
 cd {{PROJECT_PATH}}
-bun run main.ts -s hk00700,hk01810
-bun run main.ts -s sh600519,sh000001
+
+# A股持仓
+bun run main.ts -s sh600941,sh600036,sh515450 --pretty
+
+# 基金持仓
+bun run main.ts -f 006493,006961,002276,159232 --pretty
+
+# 港股持仓
+bun run main.ts --hk 00700,01810 --pretty
+
+# 股息率查询
+bun run main.ts --dividend sh600941,sh515450 --pretty
 ```
 
 ### 第三步：整体市场环境分析
@@ -650,27 +674,32 @@ bun run main.ts -s sh600519,sh000001
 ```bash
 cd {{PROJECT_PATH}}
 
-# 查询港股持仓
-bun run main.ts -s hk00700,hk01810 -o llm
+# 查询A股持仓
+bun run main.ts -s sh600941,sh600036,sh515450 --pretty
 
 # 查询基金持仓
-bun run main.ts -f 320007,110022 -o llm
+bun run main.ts -f 006493,006961,002276,159232 --pretty
 
-# 查询A股持仓
-bun run main.ts -s sh600519,sh000001 -o llm
+# 查询港股持仓
+bun run main.ts --hk 00700,01810 --pretty
+
+# 查询股息率
+bun run main.ts --dividend sh600941,sh515450 --pretty
 ```
 
-**CLI 输出格式**（大模型友好）：
+**CLI 输出格式**（JSON）：
 ```json
 [
   {
-    "type": "stock",
-    "code": "TENCENT",
-    "name": "腾讯控股",
-    "current_price": 538,
-    "change": 22,
-    "change_percent": 4.264,
-    "update_time": "2026/03/10 11:09"
+    "name": "贵州茅台",
+    "code": "600519",
+    "price": 1212.72,
+    "change": -19.28,
+    "change_percent": -1.57,
+    "update_time": "2025/06/24"
+  }
+]
+```
   }
 ]
 ```

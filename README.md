@@ -1,5 +1,11 @@
 # Stock Analytics Skill - 股市投资分析助手
 
+> 🎉 **V2.0 升级** - 2025年6月25日
+> - 重构为基于 [stock-sdk](https://github.com/chengzuopeng/stock-sdk) 的架构
+> - 新增股息率计算功能
+> - 支持A股、港股、美股、基金多市场
+> - 84个SDK方法，覆盖更多数据维度
+
 ## 项目简介
 
 Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分析技能集，专为个人投资者设计。它通过模块化的Skill架构和本地数据获取工具，帮助投资者进行市场分析、资产配置和投资决策。
@@ -246,49 +252,47 @@ bun run main.ts [options]
 ### 参数说明
 
 | 参数 | 说明 | 示例 |
-|-----|------|------|
-| `-s, --stocks` | 股票代码（逗号分隔 hk00700） | `-s,sh000001` |
-| `-f, --funds` | 基金代码（逗号分隔） | `-f 320007,110022` |
-| `-o, --format` | 输出格式: raw \| llm | `-o llm` |
-| `-h, --help` | 查看帮助 | |
+|------|------|------|
+| `-s, --stocks` | A股/ETF代码（逗号分隔） | `-s sh600519,sh600036` |
+| `-f, --funds` | 基金代码（逗号分隔） | `-f 006493,006961` |
+| `--hk` | 港股代码（逗号分隔） | `--hk 00700,01810` |
+| `--us` | 美股代码（逗号分隔） | `--us AAPL,MSFT` |
+| `--dividend` | 股息率查询 | `--dividend sh600941` |
+| `--search` | 搜索股票/基金 | `--search 招商银行` |
+| `--kline` | K线数据 | `--kline sh600519 --period daily` |
+| `-o, --format` | 输出格式 | `-o json/table/csv` |
+| `--pretty` | 美化JSON输出 | `--pretty` |
 
 ### 输出格式
 
-**LLM 格式**（默认）：
+**JSON 格式**（默认）：
 ```json
 [
   {
-    "type": "stock",
-    "code": "TENCENT",
-    "name": "腾讯控股",
-    "current_price": 538,
-    "change": 22,
-    "change_percent": 4.264,
-    "update_time": "2026/03/10 11:09"
+    "name": "贵州茅台",
+    "code": "600519",
+    "price": 1212.72,
+    "change": -19.28,
+    "change_percent": -1.57,
+    "update_time": "2025/06/24"
   }
 ]
 ```
 
-**Raw 格式**：
-```javascript
-[
-  {
-    nameEn: "TENCENT",
-    name: "腾讯控股",
-    open: 525,
-    current: 538,
-    change: 22,
-    changePercent: 4.264,
-    ...
-  }
-]
+**Table 格式**：
+```
+名称        代码     价格      涨跌    涨跌幅
+贵州茅台    600519   1212.72   -19.28  -1.57%
+招商银行    600036   36.56     -0.55   -1.48%
 ```
 
 ### 支持的市场
 
-- **港股**：hk00700（腾讯控股）、hk01810（小米集团）等
-- **A股**：sh000001（上证指数）、sh600519（贵州茅台）等
-- **基金**：天天基金网支持的基金代码
+- **A股**：sh600519（贵州茅台）、sh600036（招商银行）等
+- **港股**：00700（腾讯控股）、01810（小米集团）等
+- **美股**：AAPL（苹果）、MSFT（微软）等
+- **基金**：006493（南方中债）、006961（南方中债7-10年）等
+- **ETF**：sh515450（红利低波50ETF）等
 
 ## 使用示例
 
@@ -351,14 +355,13 @@ Agent：调用 macro-data-interpretation Skill，解读通胀数据...
 ```
 stock-analytics-skill/
 ├── main.ts                 # CLI 入口文件
-├── src/                    # 源码目录
-│   ├── api/               # API 调用模块
-│   ├── cli/               # CLI 命令行工具
-│   ├── config/           # 配置
-│   ├── formatter/        # 格式化输出
-│   ├── parser/           # 数据解析
-│   ├── types/            # 类型定义
-│   └── utils/            # 工具函数
+├── src/
+│   ├── sdk.ts             # SDK封装层（stock-sdk）
+│   ├── dividend.ts        # 股息率计算
+│   ├── format.ts          # 输出格式化
+│   └── index.ts           # 统一导出
+├── test/
+│   └── sdk.test.ts        # 测试用例
 ├── .agents/skills/        # Skill技能目录（24个技能）
 ├── position.example.md   # 持仓配置示例模板
 ├── agent.md              # Agent配置说明
@@ -370,10 +373,19 @@ stock-analytics-skill/
 
 - **运行时**：Bun
 - **CLI 框架**：Commander
-- **命令行美化**：Chalk
-- **编码处理**：iconv-lite
+- **数据SDK**：[stock-sdk](https://github.com/chengzuopeng/stock-sdk)
 - **IDE**：Trae IDE、Cursor、Windsurf 等支持 Skill 的开发工具
-- **数据源**：东方财富（股票）、天天基金（基金）
+- **数据源**：东方财富（股票/基金/港股/美股）
+
+## 致谢
+
+| 项目 | 说明 | 链接 |
+|------|------|------|
+| **stock-sdk** | 零依赖的股票数据SDK，支持84个命名空间方法，V2.0核心依赖 | [GitHub](https://github.com/chengzuopeng/stock-sdk) |
+| **天天基金** | 基金数据源 | [eastmoney.com](https://fund.eastmoney.com/) |
+| **东方财富** | 股票/港股/美股数据源 | [eastmoney.com](https://www.eastmoney.com/) |
+
+特别感谢 [stock-sdk](https://github.com/chengzuopeng/stock-sdk) 作者提供的优秀开源库，使得本项目能够轻松获取A股、港股、美股、基金等多市场数据。
 
 ## 扩展开发
 
