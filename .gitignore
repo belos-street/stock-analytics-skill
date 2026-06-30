@@ -15,6 +15,9 @@ Thumbs.db
 # 日志文件
 *.log
 
+# 个人文件
+value-table.md
+
 node_modules/
 
 *.lockb
