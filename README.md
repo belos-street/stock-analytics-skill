@@ -1,6 +1,6 @@
 # Stock Analytics Skill - 股市投资分析助手
 
-> 🎉 **V2.0 升级** - 2025年6月25日
+> 🎉 **V2.0 升级** - 2026年6月25日
 > - 重构为基于 [stock-sdk](https://github.com/chengzuopeng/stock-sdk) 的架构
 > - 新增股息率计算功能
 > - 支持A股、港股、美股、基金多市场
