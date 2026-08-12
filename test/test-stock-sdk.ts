@@ -71,19 +71,20 @@ async function main() {
   console.log('📊 1. A股行情测试')
 
   await test('A股单只股票 - 贵州茅台', async () => {
-    const quotes = execCLI('quote sh600519 --format json')
+    const quotes = execCLI('quote sh600519 --format json -q')
     printJson(quotes)
     return quotes
   })
 
   await test('A股多只股票 - 茅台+招行+移动', async () => {
-    const quotes = execCLI('quote sh600519,sh600036,sh600941 --format json')
+    // stock-sdk CLI 的多个代码用空格分隔
+    const quotes = execCLI('quote sh600519 sh600036 sh600941 --format json -q')
     printJson(quotes)
     return quotes
   })
 
   await test('A股ETF - 红利低波50ETF', async () => {
-    const quotes = execCLI('quote sh515450 --format json')
+    const quotes = execCLI('quote sh515450 --format json -q')
     printJson(quotes)
     return quotes
   })
@@ -93,7 +94,8 @@ async function main() {
   console.log('📈 2. 基金行情测试')
 
   await test('基金行情 - 南方中债3-5年农发债', async () => {
-    const quotes = execCLI('quote 006493 --format json')
+    // 基金必须显式指定 --market fund
+    const quotes = execCLI('quote 006493 --market fund --format json -q')
     printJson(quotes)
     return quotes
   })
@@ -103,7 +105,7 @@ async function main() {
   console.log('🇭🇰 3. 港股行情测试')
 
   await test('港股行情 - 腾讯控股', async () => {
-    const quotes = execCLI('quote 00700 --format json')
+    const quotes = execCLI('quote 00700 --format json -q')
     printJson(quotes)
     return quotes
   })
@@ -146,7 +148,7 @@ async function main() {
     }
 
     // 获取当前股价（使用CLI）
-    const quotes = execCLI('quote sh600941 --format json')
+    const quotes = execCLI('quote sh600941 --format json -q')
     if (!quotes || quotes.length === 0) {
       throw new Error('未获取到行情数据')
     }
@@ -170,7 +172,7 @@ async function main() {
       throw new Error('未获取到分红数据')
     }
 
-    const quotes = execCLI('quote sh600036 --format json')
+    const quotes = execCLI('quote sh600036 --format json -q')
     if (!quotes || quotes.length === 0) {
       throw new Error('未获取到行情数据')
     }

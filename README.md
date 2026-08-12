@@ -31,7 +31,7 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 风险偏好：中低风险为主，小仓位高弹性进攻，严控回撤
 ```
 
-## Skill 技能一览（24个技能）
+## Skill 技能一览（25个技能）
 
 ### 市场分析类
 
@@ -62,6 +62,7 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 | Skill | 功能 | 适用场景 |
 |-------|------|---------|
 | stock-deep-analysis | 个股深度分析 | 分析个股基本面、估值、财务数据 |
+| buffett-value-investing | 巴菲特价值投资 | 基于四大原则（能力圈、护城河、安全边际、长期持有）分析个股 |
 | stock-investment-logic | 个股投资逻辑 | 深度研究个股，生成券商风格报告 |
 | investment-memo | 投资备忘录 | 生成一页纸投资摘要 |
 | announcement-analysis | 公告与财报 | 解读公告、年报、季报 |
@@ -119,6 +120,7 @@ Stock Analytics Skill 是一个基于大语言模型（LLM）的股市投资分�
 | 八维选股 | 创始人驱动、产品力、团队等8维筛选 | growth-stock-screener |
 | 估值分析 | 估值方法、相对估值分析 | valuation-framework |
 | 个股深度 | 深度研究个股投资逻辑 | stock-investment-logic |
+| 价值投资 | 用巴菲特理念分析个股、评估安全边际 | buffett-value-investing |
 | 可比公司 | 估值对标分析 | comparable-company-analysis |
 | 投资备忘录 | 一页纸投资报告 | investment-memo |
 | 公告财报 | 解读公告、年报、业绩预告 | announcement-analysis |
@@ -165,16 +167,16 @@ cp position.example.md position.md
 
 ### 4. 配置Agent
 
-编辑 `agent.md` 文件，配置Skill调用规则和场景映射。
+编辑 `agents.md` 文件，配置Skill调用规则和场景映射。
 
 ## 首次配置说明
 
-### 为什么要配置 position.md 和 agent.md？
+### 为什么要配置 position.md 和 agents.md？
 
 本项目采用 **Skill + 配置驱动** 的架构，大模型需要通过这两个文件来理解您的投资情况：
 
 - **`position.md`**：定义您的持仓配置，包括持仓标的、目标占比、配置规则等
-- **`agent.md`**：定义Agent的工作流程，包括各场景对应调用哪个Skill、分析报告生成流程等
+- **`agents.md`**：定义Agent的工作流程，包括各场景对应调用哪个Skill、分析报告生成流程等
 
 ### 配置步骤
 
@@ -193,18 +195,18 @@ cp position.example.md position.md
 - 目标占比
 - 个人的配置规则和备注
 
-**第二步：将 agent.md 丢给大模型**
+**第二步：将 agents.md 丢给大模型**
 
-在开始使用大模型分析之前，需要将 `agent.md` 文件内容**完整复制**并发送给大模型，让大模型理解您的工作流程。
+在开始使用大模型分析之前，需要将 `agents.md` 文件内容**完整复制**并发送给大模型，让大模型理解您的工作流程。
 
 发送方式：
 ```
 请加载以下 Agent 配置文件，并按照其中的规则执行任务：
-[复制 agent.md 的完整内容]
+[复制 agents.md 的完整内容]
 ```
-或者将agent.md内容作为system prompt上传至IDE Agent对话框，生成随时可对话的智能体
+或者将agents.md内容作为system prompt上传至IDE Agent对话框，生成随时可对话的智能体
 ```
-设置->智能体->创建->输入智能体名称->agent.md内容粘贴至提示词
+设置->智能体->创建->输入智能体名称->agents.md内容粘贴至提示词
 ```
 
 **第三步：验证配置**
@@ -218,7 +220,7 @@ cp position.example.md position.md
 大模型应该会：
 1. 自动读取 `position.md` 了解您的持仓
 2. 调用CLI获取各持仓标的数据
-3. 按照 `agent.md` 中的流程进行分析
+3. 按照 `agents.md` 中的流程进行分析
 4. 给出持仓分析报告
 
 ### 配置示意图
@@ -230,7 +232,7 @@ cp position.example.md position.md
 │  用户：今天我的持仓表现怎么样？                            │
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐  │
-│  │ 大模型读取 agent.md → 了解工作流程                │  │
+│  │ 大模型读取 agents.md → 了解工作流程               │  │
 │  │ 大模型读取 position.md → 了解持仓配置            │  │
 │  │ 大模型调用 CLI 获取数据 → 各持仓标的价格          │  │
 │  │ 大模型调用对应 Skill → 分析各持仓                 │  │
@@ -253,15 +255,18 @@ bun run main.ts [options]
 
 | 参数 | 说明 | 示例 |
 |------|------|------|
-| `-s, --stocks` | A股/ETF代码（逗号分隔） | `-s sh600519,sh600036` |
+| `-s, --stocks` | A股/ETF/指数代码（逗号分隔，自动识别 sh/sz/hk 前缀） | `-s sh600519,sh600036` |
 | `-f, --funds` | 基金代码（逗号分隔） | `-f 006493,006961` |
 | `--hk` | 港股代码（逗号分隔） | `--hk 00700,01810` |
 | `--us` | 美股代码（逗号分隔） | `--us AAPL,MSFT` |
 | `--dividend` | 股息率查询 | `--dividend sh600941` |
 | `--search` | 搜索股票/基金 | `--search 招商银行` |
-| `--kline` | K线数据 | `--kline sh600519 --period daily` |
+| `--kline` | K线数据 | `--kline sh600519` |
+| `--period` | K线周期：daily / weekly / monthly | `--kline sh600519 --period weekly` |
 | `-o, --format` | 输出格式 | `-o json/table/csv` |
 | `--pretty` | 美化JSON输出 | `--pretty` |
+
+> stdout 只输出数据本身，标题与提示信息走 stderr，可直接将输出管道给 JSON 解析工具使用。
 
 ### 输出格式
 
@@ -361,10 +366,11 @@ stock-analytics-skill/
 │   ├── format.ts          # 输出格式化
 │   └── index.ts           # 统一导出
 ├── test/
-│   └── sdk.test.ts        # 测试用例
-├── .agents/skills/        # Skill技能目录（24个技能）
+│   ├── sdk.test.ts        # 测试用例（bun test）
+│   └── test-stock-sdk.ts  # stock-sdk 功能验证脚本
+├── .agents/skills/        # Skill技能目录（25个技能）
 ├── position.example.md   # 持仓配置示例模板
-├── agent.md              # Agent配置说明
+├── agents.md             # Agent配置说明
 ├── package.json          # 项目依赖
 └── README.md            # 项目介绍
 ```
@@ -391,15 +397,15 @@ stock-analytics-skill/
 
 ### 添加新的数据源
 
-1. 在 `src/api/` 目录下创建新的 API 模块
+1. 在 `src/` 目录下创建新的数据模块（参考 `src/dividend.ts`）
 2. 实现数据获取和解析函数
-3. 在 `src/cli/index.ts` 中添加对应命令
+3. 在 `main.ts` 中添加对应命令参数，并在 `src/index.ts` 中导出
 
 ### 添加新的Skill
 
 1. 在 `.agents/skills/` 目录下创建新目录
 2. 编写 `SKILL.md` 文件，定义技能说明
-3. 在 `agent.md` 中添加场景映射
+3. 在 `agents.md` 中添加场景映射
 
 ## 注意事项
 

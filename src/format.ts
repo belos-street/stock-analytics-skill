@@ -67,7 +67,8 @@ export function formatFundQuote(quote: any): FormattedFund {
     code: quote.code || quote.symbol || '',
     name: quote.name || '',
     current_price: quote.price || quote.nav || 0,
-    change_percent: quote.changePercent || 0,
+    // 基金行情接口没有 changePercent 字段，涨跌幅存放在 change 字段
+    change_percent: quote.changePercent ?? quote.change ?? 0,
     update_time: quote.timestamp
       ? new Date(quote.timestamp).toLocaleString('zh-CN')
       : new Date().toLocaleString('zh-CN')
@@ -99,7 +100,7 @@ export function outputData(
   pretty: boolean = false
 ) {
   if (!data || data.length === 0) {
-    console.log('未获取到数据')
+    console.error('未获取到数据')
     return
   }
 

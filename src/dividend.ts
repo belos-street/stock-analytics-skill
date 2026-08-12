@@ -21,9 +21,11 @@ export interface DividendYieldResult {
 /**
  * 从东方财富API获取股息率数据
  * 数据来源：https://datacenter-web.eastmoney.com/api/data/v1/get
+ * @param quote 可选的行情数据（批量查询时预先获取，避免重复请求）
  */
 async function getDividendYieldFromEastMoney(
-  symbol: string
+  symbol: string,
+  quote?: any
 ): Promise<DividendYieldResult | null> {
   try {
     // 提取纯数字代码（去掉sh/sz前缀）
@@ -64,15 +66,18 @@ async function getDividendYieldFromEastMoney(
 
     const dividends = data.result.data
 
-    // 获取当前股价（使用CLI）
-    const quotes = await getQuotes([symbol])
-    if (!quotes || quotes.length === 0) {
+    // 获取当前股价（优先使用预先获取的行情，否则单独查询）
+    if (!quote) {
+      const quotes = await getQuotes([symbol])
+      quote = quotes?.[0]
+    }
+    if (!quote) {
       console.error(`未获取到行情数据: ${symbol}`)
       return null
     }
 
-    const currentPrice = quotes[0].price
-    const stockName = quotes[0].name
+    const currentPrice = quote.price
+    const stockName = quote.name
 
     // 找到最新的已实施分红
     const latestDividend = dividends.find(
@@ -114,9 +119,11 @@ async function getDividendYieldFromEastMoney(
 
 /**
  * 从SDK获取股息率数据（备用方案）
+ * @param quote 可选的行情数据（批量查询时预先获取，避免重复请求）
  */
 async function getDividendYieldFromSDK(
-  symbol: string
+  symbol: string,
+  quote?: any
 ): Promise<DividendYieldResult | null> {
   const sdk = getSDK()
 
@@ -129,15 +136,18 @@ async function getDividendYieldFromSDK(
       return null
     }
 
-    // 获取当前股价（使用CLI）
-    const quotes = await getQuotes([symbol])
-    if (!quotes || quotes.length === 0) {
+    // 获取当前股价（优先使用预先获取的行情，否则单独查询）
+    if (!quote) {
+      const quotes = await getQuotes([symbol])
+      quote = quotes?.[0]
+    }
+    if (!quote) {
       console.error(`未获取到行情数据: ${symbol}`)
       return null
     }
 
-    const currentPrice = quotes[0].price
-    const stockName = quotes[0].name
+    const currentPrice = quote.price
+    const stockName = quote.name
 
     // 找到最新的已实施分配的分红
     const latestDividend = dividends.find(
@@ -176,35 +186,44 @@ async function getDividendYieldFromSDK(
 
 /**
  * 获取股息率（优先使用东方财富API，失败时回退到SDK）
+ * @param quote 可选的行情数据（批量查询时预先获取，避免重复请求）
  */
 export async function getDividendYield(
-  symbol: string
+  symbol: string,
+  quote?: any
 ): Promise<DividendYieldResult | null> {
   // 优先使用东方财富API
-  const eastMoneyResult = await getDividendYieldFromEastMoney(symbol)
+  const eastMoneyResult = await getDividendYieldFromEastMoney(symbol, quote)
   if (eastMoneyResult) {
     return eastMoneyResult
   }
 
   // 回退到SDK
-  console.log(`东方财富API获取失败，尝试使用SDK: ${symbol}`)
-  return getDividendYieldFromSDK(symbol)
+  console.error(`东方财富API获取失败，尝试使用SDK: ${symbol}`)
+  return getDividendYieldFromSDK(symbol, quote)
 }
 
 /**
  * 批量查询股息率
+ * 一次性批量获取所有标的行情，再并行查询各标的分红数据
  */
 export async function getDividendYields(
   symbols: string[]
 ): Promise<DividendYieldResult[]> {
-  const results: DividendYieldResult[] = []
-
-  for (const symbol of symbols) {
-    const result = await getDividendYield(symbol)
-    if (result) {
-      results.push(result)
-    }
+  let quotes: any[] = []
+  try {
+    quotes = await getQuotes(symbols)
+  } catch (error: any) {
+    console.error(`批量行情获取失败: ${error.message}`)
   }
 
-  return results
+  const results = await Promise.all(
+    symbols.map((symbol) => {
+      const code = symbol.replace(/^(sh|sz)/, '')
+      const quote = quotes.find((q: any) => q.code === code)
+      return getDividendYield(symbol, quote)
+    })
+  )
+
+  return results.filter((r): r is DividendYieldResult => r !== null)
 }

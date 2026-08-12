@@ -11,7 +11,8 @@
     "quote": "bun run main.ts -s",
     "fund": "bun run main.ts -f",
     "dividend": "bun run main.ts --dividend",
-    "test:sdk": "bun run api/test-stock-sdk.ts"
+    "test": "bun test",
+    "test:sdk": "bun run test/test-stock-sdk.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"

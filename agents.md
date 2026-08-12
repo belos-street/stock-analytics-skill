@@ -1,13 +1,8 @@
-# 长期复利投资策略 - Agent配置 变量配置
+# 长期复利投资策略 - Agent配置
 
-说明
-
-<!--
-{
-  "PROJECT_PATH": "C:\\Users\\samym\\Documents\\stock-analysis-skill\\stock-analytics-skill",
-  "POSITION_FILE": "position.md"
-}
--->
+说明：
+- 所有 `bun run main.ts` 命令默认在**项目根目录**下执行
+- 个人持仓配置文件为 `position.md`
 
 ---
 
@@ -19,9 +14,9 @@
 
 ## 配置文件
 
-### {{POSITION_FILE}} - 个人持仓配置
+### position.md - 个人持仓配置
 
-**详细持仓信息请查看**：`{{POSITION_FILE}}`
+**详细持仓信息请查看**：`position.md`
 
 该文件包含：
 - 投资者概况（风险偏好、投资目标、资产规模等）
@@ -36,12 +31,8 @@
 
 项目提供本地命令行工具，基于 [stock-sdk](https://github.com/chengzuopeng/stock-sdk)，可直接获取股票/基金实时数据：
 
-**使用方法**：
+**使用方法**（在项目根目录下执行）：
 ```bash
-# 进入项目目录
-cd {{PROJECT_PATH}}
-
-# 运行 CLI
 bun run main.ts [options]
 ```
 
@@ -67,22 +58,22 @@ bun run main.ts [options]
 **示例命令**：
 ```bash
 # 查询A股股票
-cd {{PROJECT_PATH}} && bun run main.ts -s sh600941,sh600036
+bun run main.ts -s sh600941,sh600036
 
 # 查询港股
-cd {{PROJECT_PATH}} && bun run main.ts --hk 00700
+bun run main.ts --hk 00700
 
 # 查询基金
-cd {{PROJECT_PATH}} && bun run main.ts -f 006493,006961
+bun run main.ts -f 006493,006961
 
 # 查询股息率
-cd {{PROJECT_PATH}} && bun run main.ts --dividend sh600941
+bun run main.ts --dividend sh600941
 
 # 搜索股票
-cd {{PROJECT_PATH}} && bun run main.ts --search 中国移动
+bun run main.ts --search 中国移动
 
 # 美化输出
-cd {{PROJECT_PATH}} && bun run main.ts -s sh600941 --pretty
+bun run main.ts -s sh600941 --pretty
 ```
 
 **支持的市场**：
@@ -120,6 +111,7 @@ cd {{PROJECT_PATH}} && bun run main.ts -s sh600941 --pretty
 22. **macro-data-interpretation** - 宏观数据解读
 23. **growth-stock-screener** - 八维成长股筛选
 24. **a500-index-investment** - A500指数投资策略
+25. **buffett-value-investing** - 巴菲特价值投资个股分析
 
 ---
 
@@ -234,7 +226,7 @@ cd {{PROJECT_PATH}} && bun run main.ts -s sh600941 --pretty
 **触发条件**：询问整体持仓情况、今日表现、需要做什么操作等
 
 **调用方式**：
-1. 首先读取 `{{POSITION_FILE}}` 了解持仓配置
+1. 首先读取 `position.md` 了解持仓配置
 2. 调用本地 CLI 工具获取各持仓标的数据（优先）
 3. 根据持仓标的，分别调用对应的专业Skill
 4. 最后调用 `asset-allocation-rebalancing` 给出整体建议
@@ -259,7 +251,7 @@ cd {{PROJECT_PATH}} && bun run main.ts -s sh600941 --pretty
 **数据获取**：
 优先使用CLI获取指数数据：
 ```bash
-cd {{PROJECT_PATH}} && bun run main.ts -s sh000001,sh000300
+bun run main.ts -s sh000001,sh000300
 ```
 
 **示例问题**：
@@ -267,32 +259,6 @@ cd {{PROJECT_PATH}} && bun run main.ts -s sh000001,sh000300
 - "市场现在是高还是低？"
 - "可以加仓了吗？"
 - "市场现在是什么风格？"
-
----
-
-### 场景十一：投资标的创意与筛选
-**触发条件**：主动发现新投资机会、运行量化筛选、主题投资研究、做空标的发现、特殊情况捕捉等
-
-**调用Skill**：`investment-idea-generator`
-
-**核心功能**：
-- 量化因子筛选（价值、成长、质量、做空、特殊情况）
-- 主题扫描（AI、新能源、消费升级等）
-- 宏观/行业趋势受益者识别
-- 同业对比组构建
-
-**数据获取**：
-使用WebSearch获取最新市场数据和行业信息
-
-**示例问题**：
-- "帮我找一些A股市场的价值股"
-- "筛选出成长性好的医药股"
-- "有哪些AI主题的受益公司？"
-- "找一些适合做空的高估值股票"
-- "近期有哪些分拆上市的投资机会？"
-- "在新能源行业找几个投资标的"
-- "筛选ROE高、负债率低的优质公司"
-- "美股市场有哪些被低估的科技股？"
 
 ---
 
@@ -607,20 +573,37 @@ cd {{PROJECT_PATH}} && bun run main.ts -s sh000001,sh000300
 
 ---
 
+### 场景二十五：巴菲特价值投资分析
+**触发条件**：要求用巴菲特理念/价值投资框架分析个股，或询问某股票是否值得长期价值投资
+
+**调用Skill**：`buffett-value-investing`
+
+**核心功能**：
+- 能力圈验证（业务易懂性、认知匹配度、管理层一致性）
+- 护城河评估（成本、品牌、技术、转换成本、渠道五维度）
+- 安全边际测算（估值对比、内在价值、30%安全边际阈值）
+- 长期持有可行性与建仓/持有建议
+
+**示例问题**：
+- "用巴菲特的理念分析一下贵州茅台"
+- "招商银行符合价值投资标准吗？"
+- "帮我用四大原则评估一下这家公司的护城河"
+- "这只股票现在有安全边际吗？"
+
+---
+
 ## 持仓分析报告流程
 
 当用户要求分析持仓时，按照以下流程：
 
 ### 第一步：读取持仓配置
-- 读取 `{{POSITION_FILE}}` 文件，了解投资者的持仓配置
+- 读取 `position.md` 文件，了解投资者的持仓配置
 - 了解各持仓标的的类型、代码、目标占比
 
 ### 第二步：获取实时数据
 优先使用本地 CLI 工具获取股票/基金实时数据：
 
 ```bash
-cd {{PROJECT_PATH}}
-
 # A股持仓
 bun run main.ts -s sh600941,sh600036,sh515450 --pretty
 
@@ -672,8 +655,6 @@ bun run main.ts --dividend sh600941,sh515450 --pretty
 **优先使用本地 CLI 工具**：
 
 ```bash
-cd {{PROJECT_PATH}}
-
 # 查询A股持仓
 bun run main.ts -s sh600941,sh600036,sh515450 --pretty
 
@@ -700,9 +681,6 @@ bun run main.ts --dividend sh600941,sh515450 --pretty
   }
 ]
 ```
-  }
-]
-```
 
 **备选方案**：如 CLI 无法获取某些标的，使用 WebSearch 补充搜索
 
@@ -712,13 +690,13 @@ bun run main.ts --dividend sh600941,sh515450 --pretty
 
 | 标的类型 | 代码 | 数据获取方式 |
 |---------|------|-------------|
-| 红利低波50ETF | 515450 | WebSearch |
-| 自由现金流ETF | 159201 | WebSearch |
-| A500ETF | 563360 | WebSearch |
-| 中国移动（A股） | 600941 | WebSearch |
-| 招商银行 | 600036 | WebSearch |
-| 恒生医疗ETF | 513060 | WebSearch |
-| 恒生科技ETF | 513010 | WebSearch |
+| 红利低波50ETF | 515450 | CLI：`-s sh515450` |
+| 自由现金流ETF | 159201 | CLI：`-s sz159201` |
+| A500ETF | 563360 | CLI：`-s sh563360` |
+| 中国移动（A股） | 600941 | CLI：`-s sh600941` |
+| 招商银行 | 600036 | CLI：`-s sh600036` |
+| 恒生医疗ETF | 513060 | CLI：`-s sh513060` |
+| 恒生科技ETF | 513010 | CLI：`-s sh513010` |
 | 港股标的 | hk00700 等 | CLI（优先）或 WebSearch |
 | 基金标的 | 320007 等 | CLI（优先）或 WebSearch |
 
@@ -739,7 +717,7 @@ bun run main.ts --dividend sh600941,sh515450 --pretty
 ## 持仓标的今日表现
 
 ### 原始数据（CLI获取）
-> 数据来源：本地CLI工具查询，使用 `-o raw` 参数获取原始JSON数据
+> 数据来源：本地CLI工具查询，使用 `-o json --pretty` 参数获取JSON数据
 
 ```json
 [

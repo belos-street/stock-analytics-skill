@@ -3,11 +3,21 @@
 /**
  * Stock Analytics Skill V2.0
  * 基于 stock-sdk 的股市投资分析助手
+ *
+ * 约定：stdout 只输出数据（JSON/table/csv），标题、提示、错误一律走 stderr，
+ * 保证输出可被大模型或管道直接解析。
  */
 
 import { Command } from 'commander'
 import chalk from 'chalk'
-import { getQuotes, getFundQuotes, getHKQuotes, getUSQuotes, getKline, searchStock } from './src/sdk'
+import {
+  getQuotes,
+  getFundQuotes,
+  getHKQuotes,
+  getUSQuotes,
+  getKline,
+  searchStock
+} from './src/sdk'
 import { getDividendYield, getDividendYields } from './src/dividend'
 import {
   formatAndOutputStocks,
@@ -22,12 +32,17 @@ program
   .name('stock-analytics')
   .description('股市投资分析助手 V2.0 - 基于 stock-sdk')
   .version('2.0.0')
-  .option('-s, --stocks <codes>', 'A股代码列表（逗号分隔）', '')
+  .option(
+    '-s, --stocks <codes>',
+    'A股/ETF/指数代码列表（逗号分隔，sh/sz前缀可省略）',
+    ''
+  )
   .option('-f, --funds <codes>', '基金代码列表（逗号分隔）', '')
   .option('--hk <codes>', '港股代码列表（逗号分隔）', '')
   .option('--us <codes>', '美股代码列表（逗号分隔）', '')
   .option('--dividend <codes>', '查询股息率（逗号分隔多个代码）', '')
   .option('--kline <code>', '查询K线数据', '')
+  .option('--period <period>', 'K线周期: daily | weekly | monthly', 'daily')
   .option('--search <keyword>', '搜索股票/基金', '')
   .option('-o, --format <type>', '输出格式: json | table | csv', 'json')
   .option('--pretty', 'JSON美化输出', false)
@@ -35,102 +50,117 @@ program
 
 const options = program.opts()
 
+// 预先挂载 catch，避免并行请求在后序请求被 await 前产生未处理的 rejection
+function track<T>(p: Promise<T> | null): Promise<T> | null {
+  p?.catch(() => {})
+  return p
+}
+
 async function main() {
-  const hasOptions = options.stocks || options.funds || options.hk || options.us ||
-                     options.dividend || options.kline || options.search
+  const hasOptions =
+    options.stocks ||
+    options.funds ||
+    options.hk ||
+    options.us ||
+    options.dividend ||
+    options.kline ||
+    options.search
 
   if (!hasOptions) {
-    console.log(chalk.yellow('请指定股票或基金代码'))
-    console.log(chalk.gray('使用 -h 查看帮助'))
-    console.log('')
-    console.log(chalk.cyan('示例:'))
-    console.log('  bun main.ts -s sh600519,sh600036')
-    console.log('  bun main.ts -f 006493,006961')
-    console.log('  bun main.ts --hk 00700')
-    console.log('  bun main.ts --dividend sh600941,sh600036')
-    console.log('  bun main.ts --search 招商银行')
+    console.error(chalk.yellow('请指定股票或基金代码'))
+    console.error(chalk.gray('使用 -h 查看帮助'))
+    console.error('')
+    console.error(chalk.cyan('示例:'))
+    console.error('  bun main.ts -s sh600519,sh600036')
+    console.error('  bun main.ts -f 006493,006961')
+    console.error('  bun main.ts --hk 00700')
+    console.error('  bun main.ts --dividend sh600941,sh600036')
+    console.error('  bun main.ts --search 招商银行')
     process.exit(1)
   }
 
-  try {
-    // A股查询
-    if (options.stocks) {
-      const codes = options.stocks.split(',').filter((s: string) => s.trim())
-      console.log(chalk.cyan('=== A股行情 ==='))
-      const quotes = await getQuotes(codes)
-      formatAndOutputStocks(quotes, options.format, options.pretty)
-    }
+  const split = (raw: string) => raw.split(',').filter((s: string) => s.trim())
 
-    // 基金查询
-    if (options.funds) {
-      const codes = options.funds.split(',').filter((s: string) => s.trim())
-      console.log(chalk.cyan('\n=== 基金行情 ==='))
-      const quotes = await getFundQuotes(codes)
-      formatAndOutputFunds(quotes, options.format, options.pretty)
-    }
+  const stockCodes = split(options.stocks)
+  const fundCodes = split(options.funds)
+  const hkCodes = split(options.hk)
+  const usCodes = split(options.us)
+  const dividendCodes = split(options.dividend)
 
-    // 港股查询
-    if (options.hk) {
-      const codes = options.hk.split(',').filter((s: string) => s.trim())
-      console.log(chalk.cyan('\n=== 港股行情 ==='))
-      const quotes = await getHKQuotes(codes)
-      formatAndOutputStocks(quotes, options.format, options.pretty)
-    }
+  // 并行发起所有数据请求
+  const stocksP = track(stockCodes.length > 0 ? getQuotes(stockCodes) : null)
+  const fundsP = track(fundCodes.length > 0 ? getFundQuotes(fundCodes) : null)
+  const hkP = track(hkCodes.length > 0 ? getHKQuotes(hkCodes) : null)
+  const usP = track(usCodes.length > 0 ? getUSQuotes(usCodes) : null)
+  const dividendP = track(
+    dividendCodes.length === 0
+      ? null
+      : dividendCodes.length === 1
+        ? getDividendYield(dividendCodes[0]).then((r) => (r ? [r] : []))
+        : getDividendYields(dividendCodes)
+  )
+  const klineP = track(
+    options.kline ? getKline(options.kline, options.period) : null
+  )
+  const searchP = track(options.search ? searchStock(options.search) : null)
 
-    // 美股查询
-    if (options.us) {
-      const codes = options.us.split(',').filter((s: string) => s.trim())
-      console.log(chalk.cyan('\n=== 美股行情 ==='))
-      const quotes = await getUSQuotes(codes)
-      formatAndOutputStocks(quotes, options.format, options.pretty)
+  // 按固定顺序输出各板块结果；单个板块失败不影响其他板块
+  const errors: string[] = []
+  async function output(
+    title: string,
+    p: Promise<any> | null,
+    render: (data: any[]) => void
+  ) {
+    if (!p) return
+    console.error(chalk.cyan(`\n=== ${title} ===`))
+    try {
+      const data = await p
+      render(data)
+    } catch (error: any) {
+      console.error(chalk.red(`查询失败: ${error.message}`))
+      errors.push(title)
     }
+  }
 
-    // 股息率查询
-    if (options.dividend) {
-      const codes = options.dividend.split(',').filter((s: string) => s.trim())
-      console.log(chalk.cyan('\n=== 股息率查询 ==='))
-
-      if (codes.length === 1) {
-        const result = await getDividendYield(codes[0])
-        if (result) {
-          formatAndOutputDividends([result], options.format, options.pretty)
-        } else {
-          console.log(chalk.yellow('未获取到股息率数据'))
-        }
-      } else {
-        const results = await getDividendYields(codes)
-        if (results.length > 0) {
-          formatAndOutputDividends(results, options.format, options.pretty)
-        } else {
-          console.log(chalk.yellow('未获取到股息率数据'))
-        }
-      }
+  await output('A股行情', stocksP, (data) =>
+    formatAndOutputStocks(data, options.format, options.pretty)
+  )
+  await output('基金行情', fundsP, (data) =>
+    formatAndOutputFunds(data, options.format, options.pretty)
+  )
+  await output('港股行情', hkP, (data) =>
+    formatAndOutputStocks(data, options.format, options.pretty)
+  )
+  await output('美股行情', usP, (data) =>
+    formatAndOutputStocks(data, options.format, options.pretty)
+  )
+  await output('股息率查询', dividendP, (data) => {
+    if (data.length > 0) {
+      formatAndOutputDividends(data, options.format, options.pretty)
+    } else {
+      console.error(chalk.yellow('未获取到股息率数据'))
     }
-
-    // K线查询
-    if (options.kline) {
-      console.log(chalk.cyan('\n=== K线数据 ==='))
-      const kline = await getKline(options.kline)
-      if (kline && kline.length > 0) {
-        console.log(`获取到 ${kline.length} 条K线数据`)
-        outputData(kline.slice(-10), options.format, options.pretty) // 只显示最近10条
-      } else {
-        console.log(chalk.yellow('未获取到K线数据'))
-      }
+  })
+  await output('K线数据', klineP, (data) => {
+    if (data && data.length > 0) {
+      console.error(`获取到 ${data.length} 条K线数据`)
+      outputData(data.slice(-10), options.format, options.pretty) // 只显示最近10条
+    } else {
+      console.error(chalk.yellow('未获取到K线数据'))
     }
-
-    // 搜索功能
-    if (options.search) {
-      console.log(chalk.cyan('\n=== 搜索结果 ==='))
-      const results = await searchStock(options.search)
-      if (results && results.length > 0) {
-        outputData(results, options.format, options.pretty)
-      } else {
-        console.log(chalk.yellow('未找到匹配的股票/基金'))
-      }
+  })
+  await output('搜索结果', searchP, (data) => {
+    if (data && data.length > 0) {
+      outputData(data, options.format, options.pretty)
+    } else {
+      console.error(chalk.yellow('未找到匹配的股票/基金'))
     }
-  } catch (error: any) {
-    console.error(chalk.red('执行出错:'), error.message)
+  })
+
+  if (errors.length > 0) {
+    console.error(
+      chalk.red(`\n共有 ${errors.length} 个查询失败: ${errors.join('、')}`)
+    )
     process.exit(1)
   }
 }
